@@ -21,10 +21,13 @@ jobs:
     - run: Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
     - run: Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
     - run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
-    - name: Create Tunnel
-      run: .\ngrok\ngrok.exe tcp 3389 > ngrok_output.txt
+    - name: Create Tunnel (Preview)
+      run: .\ngrok\ngrok.exe tcp 3389 --log stdout > ngrok_output.txt
     - name: Print TCP URL
       run: |
+        Start-Sleep -Seconds 5
         $ngrokOutput = Get-Content ngrok_output.txt | Out-String
         $tcpUrl = ($ngrokOutput -split '\r?\n') -match 'tcp://.*'
         Write-Host "Ngrok TCP URL: $tcpUrl"
+    - name: Start Tunnel
+      run: .\ngrok\ngrok.exe tcp 3389
